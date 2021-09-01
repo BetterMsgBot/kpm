@@ -12,8 +12,8 @@ router.get('/', (req, res, next) => {
     res.render('index', { title: 'Express' });
 })
 
-// receive file from /kpm/upload and save file to /kpm/uploads
-router.post('/upload/kpm', (req, res, next) => {
+// receive file from /kpm/uploads and save file to /kpm/uploads
+router.post('/kpm/uploads', (req, res, next) => {
     if(!req.files || Object.keys(req.files).length === 0) {
         res.status(400).json({
             status: 400,
@@ -60,6 +60,18 @@ router.post('/upload/kpm', (req, res, next) => {
             message: 'Success upload module'
         });
     })
+});
+
+router.get('/kpm/uploads', (req, res, next) => {
+    res.status(405).json({
+        status: 405,
+        message: 'GET method is not allowed'
+    })
+})
+
+router.get('/kpm/search', (req, res, next) => {
+    let fileRes = fs.readFileSync('/home/ubuntu/express-api/modules.json', 'utf8');
+    res.status(200).json(JSON.parse(fileRes))
 })
 
 export default router;
