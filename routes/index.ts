@@ -9,7 +9,7 @@ interface saveModuleInterface {
 }
 
 router.get('/', (req, res, next) => {
-    res.render('index', { title: 'Express' });
+    res.render('index', { title: "arthic.dev" })
 })
 
 // receive file from /kpm/uploads and save file to /kpm/uploads
@@ -70,8 +70,24 @@ router.get('/kpm/uploads', (req, res, next) => {
 })
 
 router.get('/kpm/search', (req, res, next) => {
-    let fileRes = fs.readFileSync('/home/ubuntu/express-api/modules.json', 'utf8');
-    res.status(200).json(JSON.parse(fileRes))
+    let fileRes = JSON.parse(fs.readFileSync('/home/ubuntu/express-api/modules.json', 'utf8'));
+    let query = req.query.q;
+
+    let tempJSON
+    fileRes.map((e: saveModuleInterface) => {
+        if(e.name === query) {
+            tempJSON = e;
+        }
+    })
+
+    if(tempJSON === undefined) {
+        res.status(400).json({ status: -310, message: 'no module there' })
+        return;
+    }
+
+    res.status(200).json(tempJSON)
+
+    // res.status(200).json(JSON.parse(fileRes))
 })
 
 export default router;
