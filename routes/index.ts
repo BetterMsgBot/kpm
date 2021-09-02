@@ -6,6 +6,7 @@ const router = express.Router();
 interface saveModuleInterface {
     id: number;
     name: string;
+    // download: string;
 }
 
 router.get('/', (req, res, next) => {
@@ -88,6 +89,40 @@ router.get('/kpm/search', (req, res, next) => {
     res.status(200).json(tempJSON)
 
     // res.status(200).json(JSON.parse(fileRes))
+})
+
+router.get('/kpm/download/:id', (req, res, next) => {
+    const isId = (!isNaN(parseInt(req.params.id)));
+
+    if(!isId) {
+        res.status(400).json({
+            status: -484,
+            message: 'id is not number'
+        })
+        return;
+    }
+
+    let fileRes = JSON.parse(fs.readFileSync('/home/ubuntu/express-api/modules.json', 'utf8'));
+
+    let isSuccess = false;
+    let fileName;
+    fileRes.map((e:saveModuleInterface) => {
+        if(e.id === parseInt(req.params.id)) {
+            isSuccess = true;
+            fileName = e.name
+        }
+    });
+
+    if(!isSuccess) {
+        res.status(400).json({
+            status: -431,
+            message: 'id is not defined'
+        })
+
+        return;
+    }
+
+    res.download(`/home/ubuntu/express-api/uploads/${parseInt(req.params.id)}.zip`, `package-${fileName}.zip`)
 })
 
 export default router;
