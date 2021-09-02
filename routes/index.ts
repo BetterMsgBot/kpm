@@ -6,7 +6,7 @@ const router = express.Router();
 interface saveModuleInterface {
     id: number;
     name: string;
-    // download: string;
+    download: string;
 }
 
 router.get('/', (req, res, next) => {
@@ -23,7 +23,14 @@ router.post('/kpm/uploads', (req, res, next) => {
         return;
     }
 
-    let modulesFile = req.files.module as UploadedFile;
+    let modulesFile = req.files.file as UploadedFile;
+    let version = req.body.version || null;
+    if(version === null) {
+        res.status(400).json({
+            status: -112,
+            message: 'version info not exists'
+        })
+    }
     const savedFile = JSON.parse(fs.readFileSync('/home/ubuntu/express-api/modules.json', 'utf8'));
 
     let isSuccess = true
@@ -53,7 +60,8 @@ router.post('/kpm/uploads', (req, res, next) => {
             });
         }
 
-        savedFile.unshift({ id: ++bfi, name: modulesFile.name.replace(".zip", "") })
+        let packageId = ++bfi;
+        savedFile.unshift({ id: packageId, name: modulesFile.name.replace(".zip", ""), download: `https://arthic.dev/kpm/download/${packageId}` })
         fs.writeFileSync('/home/ubuntu/express-api/modules.json', JSON.stringify(savedFile, null, 4))
         res.status(200).json({
             status: 0,
