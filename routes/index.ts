@@ -52,7 +52,7 @@ router.post('/kpm/uploads', (req, res, next) => {
             });
         }
 
-        savedFile.unshift({ id: ++bfi, name: modulesFile.name })
+        savedFile.unshift({ id: ++bfi, name: modulesFile.name.replace(".zip", "") })
         fs.writeFileSync('/home/ubuntu/express-api/modules.json', JSON.stringify(savedFile, null, 4))
         res.status(200).json({
             status: 0,
