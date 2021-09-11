@@ -1,7 +1,10 @@
 import express from "express";
 import { UploadedFile } from "express-fileupload";
+import * as crypto from "crypto";
+import sqlite from 'sqlite3'
 import fs from 'fs'
 const router = express.Router();
+const db = new sqlite.Database("loginList")
 
 interface saveModuleInterface {
     id: number;
@@ -11,6 +14,36 @@ interface saveModuleInterface {
 
 router.get('/', (req, res, next) => {
     res.render('index', { title: "arthic.dev" })
+})
+
+router.post('/kpm/register', (req, res, next) => {
+    if(!req.body.email || !req.body.password) {
+        res.status(400).json({
+            status: -303,
+            message: 'email 또는 password가 없습니다.'
+        });
+        return;
+    }
+
+    db.serialize(() => {
+
+    })
+})
+
+router.post('/kpm/login', (req, res , next) => {
+    if(!req.body.email || !req.body.password) {
+        res.status(400).json({
+            status: -303,
+            message: 'email 또는 password가 없습니다.'
+        });
+        return;
+    }
+
+    res.status(200).json({
+        status: 0,
+        message: 'Success Login',
+        token: crypto.randomBytes(16).toString('hex')
+    })
 })
 
 // receive file from /kpm/uploads and save file to /kpm/uploads
@@ -80,16 +113,16 @@ router.get('/kpm/uploads', (req, res, next) => {
 
 router.get('/kpm/search', (req, res, next) => {
     let fileRes = JSON.parse(fs.readFileSync('/home/ubuntu/express-api/modules.json', 'utf8'));
-    let query = req.query.q;
+    let query:string = req.query.q as string;
 
-    let tempJSON
+    let tempJSON: saveModuleInterface[] = [];
     fileRes.map((e: saveModuleInterface) => {
-        if(e.name === query) {
-            tempJSON = e;
+        if(e.name.startsWith(query)) {
+            tempJSON.push(e);
         }
     })
 
-    if(tempJSON === undefined) {
+    if(tempJSON === []) {
         res.status(400).json({ status: -310, message: 'no module there' })
         return;
     }
