@@ -3,13 +3,15 @@ import { UploadedFile } from "express-fileupload";
 import * as crypto from "crypto";
 import sqlite from 'sqlite3'
 import fs from 'fs'
+import {ModuleType} from "./file/moduleType";
 const router = express.Router();
-const db = new sqlite.Database("loginList")
+const db = new sqlite.Database("./db/login.db", (err) => err ? console.log("DB 연결 오류") : console.log("정상적으로 DB에 연결함"))
 
 interface saveModuleInterface {
     id: number;
     name: string;
     download: string;
+    type: ModuleType;
 }
 
 router.get('/', (req, res, next) => {
@@ -58,6 +60,13 @@ router.post('/kpm/uploads', (req, res, next) => {
 
     let modulesFile = req.files.file as UploadedFile;
     let version = req.body.version || null;
+    let type = req.body.type || null;
+    if(!type) {
+        res.status(400).json({
+            status: -112,
+            message: 'type not exists'
+        })
+    }
     if(version === null) {
         res.status(400).json({
             status: -112,
@@ -94,7 +103,7 @@ router.post('/kpm/uploads', (req, res, next) => {
         }
 
         let packageId = ++bfi;
-        savedFile.unshift({ id: packageId, name: modulesFile.name.replace(".zip", ""), download: `https://arthic.dev/kpm/download/${packageId}` })
+        savedFile.unshift({ id: packageId, name: modulesFile.name.replace(".zip", ""), download: `https://arthic.dev/kpm/download/${packageId}`, type: type })
         fs.writeFileSync('/home/ubuntu/express-api/modules.json', JSON.stringify(savedFile, null, 4))
         res.status(200).json({
             status: 0,
@@ -123,13 +132,11 @@ router.get('/kpm/search', (req, res, next) => {
     })
 
     if(tempJSON === []) {
-        res.status(400).json({ status: -310, message: 'no module there' })
+        res.status(400).json({ status: -310, message: 'no module there' });
         return;
     }
 
-    res.status(200).json(tempJSON)
-
-    // res.status(200).json(JSON.parse(fileRes))
+    res.status(200).json(tempJSON);
 })
 
 router.get('/kpm/download/:id', (req, res, next) => {
