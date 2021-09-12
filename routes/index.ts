@@ -5,7 +5,7 @@ import sqlite from 'sqlite3'
 import fs from 'fs'
 import {ModuleType} from "./file/moduleType";
 const router = express.Router();
-const db = new sqlite.Database("./db/login.db", (err) => err ? console.log("DB 연결 오류") : console.log("정상적으로 DB에 연결함"))
+const db = new sqlite.Database("./db/login.db", (err) => err ? console.log(`Error Connecting DB: ${err.message}`) : console.log(`Success Connecting DB`));
 
 interface saveModuleInterface {
     id: number;
@@ -27,9 +27,7 @@ router.post('/kpm/register', (req, res, next) => {
         return;
     }
 
-    db.serialize(() => {
-
-    })
+    db.run("CREATE TABLE user(id integer primary key, name text not null, email text unique)");
 })
 
 router.post('/kpm/login', (req, res , next) => {
