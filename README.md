@@ -2,6 +2,8 @@
 
 <p align="center">
 KakaoBot Package Manager
+<br>
+<a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt=""></a>
 </p>
 
 > **Note**: KakaoBot Package Manager은 개발중인 api입니다. 따라서 아직 api서비스 가입 페이지는 존재하지않습니다.
