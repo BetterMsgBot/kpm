@@ -27,7 +27,7 @@ router.post('/kpm/register', (req, res, next) => {
         return;
     }
 
-    db.run("CREATE TABLE user(id integer primary key, name text not null, email text unique)");
+    db.run("CREATE TABLE user(id integer primary key, name text not null, email text unique, isLogin boolean not null)");
 })
 
 router.post('/kpm/login', (req, res , next) => {
